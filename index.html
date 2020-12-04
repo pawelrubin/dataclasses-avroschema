@@ -217,6 +217,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#notice-of-non-breaking-schema-changes" class="md-nav__link">
+    Notice of non-breaking schema changes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
     Requirements
   </a>
@@ -432,6 +439,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#notice-of-non-breaking-schema-changes" class="md-nav__link">
+    Notice of non-breaking schema changes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
     Requirements
   </a>
@@ -494,6 +508,10 @@
 <h2 id="notice-of-breaking-change">Notice of breaking change</h2>
 <p>As of version <strong>0.19.0</strong>, the default Avro type for Python ints has been changed from <code>int</code> to <code>long</code> and the default Avro
 type for Python floats has been changed from <code>float</code> to <code>double</code>. Please take care when upgrading.</p>
+<h2 id="notice-of-non-breaking-schema-changes">Notice of non-breaking schema changes</h2>
+<p>As of version <strong>0.21.0</strong> the logic used generate schemas for unions has been updated to match the Avro specification. 
+Previously a field like <code>typing.Union[int, str] = 'STRING TYPE'</code> would generate the union field <code>["long", "string"]</code>, which was incorrect - the Avro specification requires the type of a provided default to match the type of the first element in the union array. 
+This update was tested under Full compatibility, and while it wasn't a breaking change (changes to defaults generally go through cleanly), it did generate a new schema version.</p>
 <h2 id="requirements">Requirements</h2>
 <p><code>python 3.7+</code></p>
 <h2 id="installation">Installation</h2>

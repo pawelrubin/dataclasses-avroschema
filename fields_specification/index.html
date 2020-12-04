@@ -624,7 +624,10 @@ In future version we will have a custom enum type to avoid this</p>
 <p>size: an integer, specifying the number of bytes per value (required).</p>
 </li>
 <li>
-<p>Unions: <code>Unions</code> are represented using JSON arrays. For example, <code>["null", "string"]</code> declares a schema which may be either a null or string.</p>
+<p>Unions: <code>Unions</code> are represented using JSON arrays. For example, <code>["null", "string"]</code> declares a schema which may be either a null or string. 
+Under the Avro specifications, if a union field as a default, the type of the default must be the first listed type in the array. 
+Dataclasses-avroschema will automatically generate the appropriate array if a default is provided. Note that an optional field (typing.Optional[T]) generates the union <code>[T, null]</code>, where <code>T</code> is the first element in the union. 
+<code>None</code> will need to be explicitly declared the default to generate the appropriate schema, if the default should be <code>None/null</code>. </p>
 </li>
 <li>
 <p>Records: <code>Records</code> use the type name <code>record</code> and will represent the <code>Schema</code>.</p>
@@ -788,7 +791,7 @@ In future version we will have a custom enum type to avoid this</p>
 <td>do not apply</td>
 </tr>
 <tr>
-<td>Pythin classs</td>
+<td>Python class</td>
 <td>record</td>
 <td>do not apply</td>
 </tr>
@@ -803,7 +806,7 @@ In future version we will have a custom enum type to avoid this</p>
 <td>time-millis</td>
 </tr>
 <tr>
-<td>datetime.datetim</td>
+<td>datetime.datetime</td>
 <td>long</td>
 <td>timestamp-millis</td>
 </tr>
