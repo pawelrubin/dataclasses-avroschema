@@ -4,7 +4,7 @@ import typing
 
 from dacite import Config, from_dict
 
-from dataclasses_avroschema import schema_definition, serialization, utils
+from dataclasses_avroschema import case, schema_definition, serialization, utils
 
 from .fields import FieldType
 
@@ -54,8 +54,13 @@ class AvroModel:
         return schema_definition.AvroSchemaDefinition("record", cls.klass, metadata=cls.metadata)
 
     @classmethod
-    def avro_schema(cls: typing.Any) -> str:
-        return json.dumps(cls.generate_schema(schema_type=AVRO).render())
+    def avro_schema(cls: typing.Any, case_type: typing.Optional[str] = None) -> str:
+        schema = cls.generate_schema(schema_type=AVRO).render()
+
+        if case_type is not None:
+            schema = case.case_record(schema, case_type)
+
+        return json.dumps(schema)
 
     @classmethod
     def avro_schema_to_python(cls: typing.Any) -> typing.Dict[str, typing.Any]:
