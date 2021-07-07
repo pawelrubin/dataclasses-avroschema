@@ -57,6 +57,8 @@ class SchemaMetadata:
     namespace: typing.Optional[typing.List[str]] = None
     aliases: typing.Optional[typing.List[str]] = None
     alias_nested_items: typing.Dict[str, str] = field(default_factory=dict)
+    key: typing.Optional[str] = None
+    key_serializer: typing.Optional[typing.Callable[[typing.Any], bytes]] = None
 
     @classmethod
     def create(cls, klass: typing.Any) -> typing.Any:
@@ -66,6 +68,8 @@ class SchemaMetadata:
             namespace=getattr(klass, "namespace", None),
             aliases=getattr(klass, "aliases", None),
             alias_nested_items=getattr(klass, "alias_nested_items", {}),
+            key=getattr(klass, "key", None),
+            key_serializer=getattr(klass, "key_serializer", None),
         )
 
     def get_alias(self, name: str) -> typing.Optional[str]:

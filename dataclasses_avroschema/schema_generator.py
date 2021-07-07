@@ -21,7 +21,11 @@ class AvroModel:
 
     schema_def: typing.Optional[AvroSchemaDefinition] = None
     klass: typing.Any = None
-    metadata: typing.Optional[SchemaMetadata] = None
+    metadata: SchemaMetadata
+
+    def __init_subclass__(cls, *args: typing.Any, **kwargs: typing.Any) -> None:
+        super().__init_subclass__(*args, **kwargs)
+        cls.metadata = cls.generate_metadata()
 
     @classmethod
     def generate_dataclass(cls: typing.Any) -> typing.Any:
@@ -53,19 +57,19 @@ class AvroModel:
         return cls.schema_def
 
     @classmethod
-    def _generate_avro_schema(cls: typing.Any) -> AvroSchemaDefinition:
+    def _generate_avro_schema(cls) -> AvroSchemaDefinition:
         return AvroSchemaDefinition("record", cls.klass, metadata=cls.metadata)
 
     @classmethod
-    def avro_schema(cls: typing.Any) -> str:
+    def avro_schema(cls) -> str:
         return json.dumps(cls.generate_schema(schema_type=AVRO).render())
 
     @classmethod
-    def avro_schema_to_python(cls: typing.Any) -> typing.Dict[str, typing.Any]:
+    def avro_schema_to_python(cls) -> JsonDict:
         return json.loads(cls.avro_schema())
 
     @classmethod
-    def get_fields(cls: typing.Any) -> typing.List[FieldType]:
+    def get_fields(cls) -> typing.List[FieldType]:
         if cls.schema_def is None:
             return cls.generate_schema().fields
         return cls.schema_def.fields
@@ -132,3 +136,24 @@ class AvroModel:
         payload = {field.name: field.fake() for field in cls.get_fields()}
 
         return from_dict(data_class=cls, data=payload, config=Config(**cls.config()))
+
+    @property
+    def key(self) -> bytes:
+        if not self.metadata.key:
+            raise NotImplementedError("`key` attribute is not specified! You can declare it via a Meta class attribute")
+
+        try:
+            key_field = getattr(self, self.metadata.key)
+        except AttributeError:
+            raise RuntimeError(f"There is no field with name {self.metadata.key}!")
+
+        if self.metadata.key_serializer:
+            return self.metadata.key_serializer(key_field)
+
+        if isinstance(key_field, bytes):
+            return key_field
+
+        if isinstance(key_field, str):
+            return key_field.encode()
+
+        raise RuntimeError(f"I don't know how to encode the key for {self.metadata.key} of type {type(key_field)}!")
